@@ -1,0 +1,18 @@
+1. Why it is called mark-up Language?
+Ans: HTML uses tags to mark-up different parts of a web page.
+Ex <h1>Hello</h1> 
+Here h1 tags tells the browser that h1 is a heading
+
+2. What is the purpose of <!Doctype> in html?
+Ans: It tells the browser that the document is written in HTML5.
+
+3. What are tags?
+Ans: Tags are the pre-defined keywords enclosed in angle brackets.
+
+4. What are attributes?
+Ans: Attributes provides extra information about an element. 
+Ex: src, alt
+
+5. Difference between id and class?
+Ans: id → Used for one unique element on the page.
+    class → Used for multiple elements that share the same style or behavior.
