@@ -16,3 +16,7 @@ Ex: src, alt
 5. Difference between id and class?
 Ans: id → Used for one unique element on the page.
     class → Used for multiple elements that share the same style or behavior.
+
+6. localStorage aur sessionStorage mein fark?
+localStorage ka data permanently store rehta hai (browser band karne ke baad bhi), jab tak manually clear na
+ho. sessionStorage ka data sirf tab/window ki session tak rehta hai — tab band karte hi delete ho jata hai.
