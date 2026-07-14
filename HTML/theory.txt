@@ -20,3 +20,8 @@ Ans: id → Used for one unique element on the page.
 6. localStorage aur sessionStorage mein fark?
 localStorage ka data permanently store rehta hai (browser band karne ke baad bhi), jab tak manually clear na
 ho. sessionStorage ka data sirf tab/window ki session tak rehta hai — tab band karte hi delete ho jata hai.
+
+7. Cookies, localStorage aur sessionStorage mein fark?
+Cookies server ko har request ke saath automatically bhejte hain (size limit ~4KB), aur expiry set kar sakte
+hain. localStorage/sessionStorage sirf client-side rehte hain, server ko automatically nahi jaate, aur zyada
+storage (~5-10MB) allow karte hain.
