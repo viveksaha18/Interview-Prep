@@ -25,3 +25,17 @@ ho. sessionStorage ka data sirf tab/window ki session tak rehta hai — tab band
 Cookies server ko har request ke saath automatically bhejte hain (size limit ~4KB), aur expiry set kar sakte
 hain. localStorage/sessionStorage sirf client-side rehte hain, server ko automatically nahi jaate, aur zyada
 storage (~5-10MB) allow karte hain.
+
+Q11. Void/empty elements kya hote hain? Example do.
+Wo elements jinka koi closing tag ya content nahi hota. Example: 
+<link> .
+
+Q13. <strong> aur <b> mein kya fark hai (same for <em> vs <i>)?
+<b> sirf visually bold karta hai, koi semantic meaning nahi. 
+<strong> semantically important content
+dikhata hai (screen readers isko emphasize karte hain). Same logic 
+<i> (visual italic) vs em(semantic emphasis) mein.
+
+Q15. Progressive rendering / DOM ka HTML se kya connection hai?
+Browser HTML ko parse karke DOM tree banata hai. CSS se CSSOM banta hai. Dono milkar Render Tree
+banate hain jo actual screen par paint hota hai. Yeh flow interviews mein bhi pucha jata hai (critical rendering path)
