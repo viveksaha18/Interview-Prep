@@ -1,0 +1,718 @@
+# OS Concurrency & Deadlock Notes (Placement Revision)
+
+> 📚 Subject: Operating System
+> 🎯 Placement + Semester Revision
+> ⏱️ Revision Time: 15-20 Minutes
+
+---
+
+# 1. Concurrency
+
+## Definition
+
+Concurrency = Multiple tasks/processes execute during the same time period.
+
+> Multiple tasks overlap in execution.
+
+### Example
+
+- Browser running
+- Music playing
+- File downloading
+
+All can execute concurrently.
+
+---
+
+# 2. Sequential Execution
+
+```text
+S1;
+S2;
+S3;
+```
+
+Execution
+
+```
+S1
+ ↓
+S2
+ ↓
+S3
+```
+
+### Points
+
+- One statement executes at a time.
+- Next statement starts only after previous finishes.
+- No parallelism.
+
+---
+
+# 3. Parbegin - Parend ⭐⭐⭐
+
+Used for **Parallel Execution**.
+
+## Syntax
+
+```text
+Parbegin
+
+S1;
+S2;
+S3;
+
+Parend
+
+S4;
+```
+
+Execution
+
+```
+       Start
+      /  |  \
+    S1  S2  S3
+      \ | /
+       S4
+```
+
+### Remember
+
+- S1, S2, S3 execute simultaneously.
+- S4 starts **only after** S1, S2 and S3 complete.
+
+---
+
+## Nested Parbegin
+
+Parbegin can be used inside another Parbegin.
+
+Example
+
+```text
+Parbegin
+    S1;
+
+    begin
+        S2;
+        S3;
+    end
+
+    S4;
+
+Parend
+```
+
+### Rule
+
+- Outer **Parbegin** → Parallel
+- Inner **begin-end** → Sequential
+
+---
+
+# 4. Precedence Graph ⭐⭐⭐⭐
+
+## Definition
+
+Graph representing execution dependency.
+
+### Components
+
+- Node → Statement
+- Arrow → Must execute before
+
+Example
+
+```
+S1
+↓
+S2
+↓
+S3
+```
+
+Meaning
+
+- S2 after S1
+- S3 after S2
+
+---
+
+Example
+
+```
+      S1
+     /  \
+   S2   S3
+     \  /
+      S4
+```
+
+Meaning
+
+- S2 & S3 execute in parallel.
+- S4 waits for both.
+
+---
+
+# 5. Program ↔ Precedence Graph ⭐⭐⭐
+
+Program
+
+```text
+S1;
+
+Parbegin
+S2;
+S3;
+Parend
+
+S4;
+```
+
+Graph
+
+```
+      S1
+     /  \
+   S2   S3
+     \  /
+      S4
+```
+
+Interview favorite question.
+
+---
+
+# 6. Valid Output Sequence ⭐⭐⭐
+
+Suppose
+
+Thread-1
+
+```
+A
+B
+C
+```
+
+Thread-2
+
+```
+D
+E
+```
+
+### Valid
+
+```
+ABCDE
+ABDEC
+DABCE
+```
+
+### Invalid
+
+```
+BACDE ❌
+```
+
+Why?
+
+B cannot come before A.
+
+```
+EDABC ❌
+```
+
+Why?
+
+E cannot come before D.
+
+---
+
+## Rule
+
+Internal ordering of each thread never changes.
+
+Only interleaving is allowed.
+
+---
+
+# 7. Fork - Join ⭐⭐⭐
+
+## Fork
+
+Creates new concurrent thread/process.
+
+```
+      S1
+
+     Fork
+
+   /     \
+
+ S2      S3
+```
+
+---
+
+## Join
+
+Waits until all child threads complete.
+
+```
+S2 ----\
+         ---> Join ---> S4
+S3 ----/
+```
+
+Meaning
+
+S4 starts only after S2 and S3 finish.
+
+---
+
+## Difference
+
+| Parbegin | Fork |
+|-----------|------|
+| Compile Time | Runtime |
+| Static | Dynamic |
+| Fixed Threads | Variable Threads |
+
+---
+
+# 8. Deadlock ⭐⭐⭐⭐⭐
+
+## Definition
+
+Deadlock occurs when two or more processes keep waiting for each other forever.
+
+> Everyone is waiting and nobody can proceed.
+
+Example
+
+```
+P1 has Printer
+Needs Scanner
+
+P2 has Scanner
+Needs Printer
+```
+
+Result
+
+```
+P1 Waiting
+
+P2 Waiting
+
+Forever
+```
+
+---
+
+## Consequences
+
+- CPU idle
+- Resource wastage
+- Low throughput
+- Program hangs
+
+---
+
+# 9. Four Necessary Conditions ⭐⭐⭐⭐⭐
+
+Deadlock occurs **only if all four conditions are true.**
+
+---
+
+## 1. Mutual Exclusion
+
+One resource can be used by only one process at a time.
+
+Example
+
+Printer
+
+Only one process can use it.
+
+---
+
+## 2. Hold and Wait
+
+Process holds one resource and requests another.
+
+Example
+
+P1
+
+Has Printer
+
+Waiting for Scanner.
+
+---
+
+## 3. No Preemption
+
+OS cannot forcibly take resource back.
+
+Process releases resource voluntarily.
+
+---
+
+## 4. Circular Wait
+
+Processes wait in circular chain.
+
+```
+P1 → P2
+
+↑      ↓
+
+P4 ← P3
+```
+
+Cycle exists.
+
+Deadlock occurs.
+
+---
+
+## Placement Trick
+
+Remove any one condition
+
+➡ Deadlock cannot occur.
+
+---
+
+# 10. Resource Allocation Graph (RAG) ⭐⭐⭐⭐
+
+Used to represent process-resource relationship.
+
+---
+
+## Symbols
+
+### Process
+
+```
+(P1)
+```
+
+Circle
+
+---
+
+### Resource
+
+```
+[R1]
+```
+
+Square
+
+---
+
+## Request Edge
+
+```
+P → R
+```
+
+Meaning
+
+Process is requesting resource.
+
+---
+
+## Allocation Edge
+
+```
+R → P
+```
+
+Meaning
+
+Resource allocated to process.
+
+---
+
+## Deadlock Detection
+
+### Single Instance Resource
+
+Cycle
+
+➡ Deadlock
+
+---
+
+### Multi Instance Resource
+
+Cycle
+
+❌ Not always deadlock.
+
+---
+
+# 11. Deadlock Handling Strategies ⭐⭐⭐⭐
+
+## 1. Prevention
+
+Prevent deadlock from occurring.
+
+Break any one necessary condition.
+
+---
+
+## 2. Avoidance
+
+Allow allocation only if system remains in Safe State.
+
+### Algorithm
+
+**Banker's Algorithm**
+
+---
+
+## 3. Detection & Recovery
+
+- Allow deadlock
+- Detect it
+- Kill process / Recover resources
+
+---
+
+## 4. Ignore
+
+Do nothing.
+
+Known as
+
+**Ostrich Algorithm**
+
+Used by Unix/Linux/Windows in many practical situations.
+
+---
+
+# 12. Deadlock Prevention Methods
+
+| Condition | Prevention |
+|------------|------------|
+| Mutual Exclusion | Make resource shareable (if possible) |
+| Hold & Wait | Allocate all resources together |
+| No Preemption | Take resources forcefully |
+| Circular Wait | Resource numbering |
+
+---
+
+# Frequently Asked Placement Questions ⭐⭐⭐⭐⭐
+
+## Q1. What is Concurrency?
+
+Multiple tasks executing during same time period.
+
+---
+
+## Q2. Difference between Sequential & Parallel Execution?
+
+Sequential
+
+```
+S1
+↓
+S2
+↓
+S3
+```
+
+Parallel
+
+```
+S1
+/ | \
+S2 S3 S4
+```
+
+---
+
+## Q3. What is Precedence Graph?
+
+Execution dependency graph.
+
+---
+
+## Q4. What does Arrow represent?
+
+Must execute before.
+
+---
+
+## Q5. S4 executes when?
+
+```
+Parbegin
+
+S1
+S2
+S3
+
+Parend
+
+S4
+```
+
+Answer
+
+After S1, S2 and S3 all complete.
+
+---
+
+## Q6. What is Fork?
+
+Creates concurrent thread/process.
+
+---
+
+## Q7. What is Join?
+
+Waits for all child threads.
+
+---
+
+## Q8. Define Deadlock.
+
+Processes wait forever for each other's resources.
+
+---
+
+## Q9. Four Necessary Conditions?
+
+1. Mutual Exclusion
+2. Hold and Wait
+3. No Preemption
+4. Circular Wait
+
+---
+
+## Q10. If one condition is removed?
+
+Deadlock cannot occur.
+
+---
+
+## Q11. What is RAG?
+
+Resource Allocation Graph.
+
+---
+
+## Q12. Request Edge?
+
+```
+P → R
+```
+
+Process requesting resource.
+
+---
+
+## Q13. Allocation Edge?
+
+```
+R → P
+```
+
+Resource allocated to process.
+
+---
+
+## Q14. Cycle in Single Instance RAG?
+
+Deadlock.
+
+---
+
+## Q15. Deadlock Avoidance Algorithm?
+
+Banker's Algorithm.
+
+---
+
+## Q16. Ignore Strategy?
+
+Ostrich Algorithm.
+
+---
+
+# One Page Placement Revision 🚀
+
+## Concurrency
+
+- Multiple tasks execute together.
+- Sequential → One by one.
+- Parbegin-Parend → Parallel execution.
+- Fork → Create threads.
+- Join → Wait for all threads.
+- Precedence Graph → Dependency graph.
+- Internal thread order never changes.
+
+---
+
+## Deadlock
+
+Definition
+
+Processes wait forever for each other.
+
+### Four Conditions
+
+- Mutual Exclusion
+- Hold & Wait
+- No Preemption
+- Circular Wait
+
+Remove any one condition → No Deadlock.
+
+---
+
+## RAG
+
+- Circle → Process
+- Square → Resource
+- P → R → Request
+- R → P → Allocation
+
+Single Instance + Cycle = Deadlock
+
+---
+
+## Handling
+
+1. Prevention
+2. Avoidance (**Banker's Algorithm**)
+3. Detection & Recovery
+4. Ignore (**Ostrich Algorithm**)
+
+---
+
+# Interview Keywords
+
+- Concurrency
+- Parallel Execution
+- Precedence Graph
+- Fork
+- Join
+- Deadlock
+- Mutual Exclusion
+- Hold & Wait
+- No Preemption
+- Circular Wait
+- Resource Allocation Graph
+- Banker's Algorithm
+- Ostrich Algorithm
