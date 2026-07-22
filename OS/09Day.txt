@@ -1,0 +1,908 @@
+# OS Synchronization Notes (Placement Revision)
+
+> 📚 Subject: Operating System
+> 🎯 Placement + Interview Revision
+> ⏱️ Revision Time: 15-20 min
+
+---
+
+# 1. Producer Consumer Problem
+
+## Problem
+
+- Producer buffer me item **insert** karta hai.
+- Consumer buffer se item **remove** karta hai.
+- Goal → Buffer Overflow aur Buffer Underflow avoid karna.
+- Synchronization ke liye **Semaphore** use hota hai.
+
+---
+
+## Semaphores
+
+```text
+Empty = N
+Full = 0
+Mutex = 1
+```
+
+| Semaphore | Meaning |
+|-----------|---------|
+| Empty | Buffer me kitni empty slots available hain |
+| Full | Buffer me kitne items present hain |
+| Mutex | Ek time par sirf ek process buffer access karega |
+
+---
+
+## Producer Flow
+
+```text
+Produce Item
+      ↓
+Wait(Empty)
+      ↓
+Wait(Mutex)
+      ↓
+Insert Item
+      ↓
+Signal(Mutex)
+      ↓
+Signal(Full)
+```
+
+### Step-by-Step Theory
+
+### 1. Produce Item
+
+Producer pehle naya item create karta hai.
+
+---
+
+### 2. Wait(Empty)
+
+```text
+Wait(Empty)
+```
+
+**Purpose**
+
+- Check karta hai buffer me khali jagah hai ya nahi.
+- Agar Empty = 0 ho to producer wait karega.
+- Buffer Overflow prevent karta hai.
+
+---
+
+### 3. Wait(Mutex)
+
+```text
+Wait(Mutex)
+```
+
+**Purpose**
+
+- Buffer ko lock karta hai.
+- Ek time par sirf ek process buffer access kare.
+- Race Condition avoid hoti hai.
+
+---
+
+### 4. Insert Item
+
+```text
+Insert Item
+```
+
+Producer item ko buffer ke andar store karta hai.
+
+---
+
+### 5. Signal(Mutex)
+
+```text
+Signal(Mutex)
+```
+
+**Purpose**
+
+- Lock release karta hai.
+- Ab doosra producer ya consumer buffer access kar sakta hai.
+
+---
+
+### 6. Signal(Full)
+
+```text
+Signal(Full)
+```
+
+**Purpose**
+
+- Batata hai ki buffer me ek naya item aa gaya hai.
+- Consumer ko signal milta hai ki consume kar sakta hai.
+
+---
+
+## Consumer Flow
+
+```text
+Wait(Full)
+     ↓
+Wait(Mutex)
+     ↓
+Remove Item
+     ↓
+Signal(Mutex)
+     ↓
+Signal(Empty)
+     ↓
+Consume Item
+```
+
+### Step-by-Step Theory
+
+### 1. Wait(Full)
+
+```text
+Wait(Full)
+```
+
+**Purpose**
+
+- Check karta hai buffer me item available hai ya nahi.
+- Agar Full = 0 ho to consumer wait karega.
+- Buffer Underflow prevent karta hai.
+
+---
+
+### 2. Wait(Mutex)
+
+```text
+Wait(Mutex)
+```
+
+**Purpose**
+
+- Buffer lock karta hai.
+- Sirf ek process remove operation karega.
+
+---
+
+### 3. Remove Item
+
+```text
+Remove Item
+```
+
+Consumer buffer se item remove karta hai.
+
+---
+
+### 4. Signal(Mutex)
+
+```text
+Signal(Mutex)
+```
+
+Lock release karta hai.
+
+---
+
+### 5. Signal(Empty)
+
+```text
+Signal(Empty)
+```
+
+Buffer me ek slot khali ho gayi.
+
+Producer fir se insert kar sakta hai.
+
+---
+
+### 6. Consume Item
+
+```text
+Consume Item
+```
+
+Buffer ke bahar item ko use/process karta hai.
+
+---
+
+## Important Points
+
+- **Empty → Overflow rokta hai**
+- **Full → Underflow rokta hai**
+- **Mutex → Race Condition rokta hai**
+
+---
+
+## Interview Trick
+
+### Producer me Wait(Empty) pehle aur Wait(Mutex) baad me kyu?
+
+Agar pehle Mutex lock kar diya aur baad me pata chala buffer full hai,
+
+to producer lock pakad kar wait karega.
+
+Consumer lock nahi le payega.
+
+Result → **Deadlock**
+
+Isliye pehle resource check hota hai, fir lock liya jata hai.
+
+---
+
+# 2. Reader Writer Problem
+
+## Problem
+
+Ek shared database ko multiple readers aur writers access karte hain.
+
+### Rules
+
+- Multiple Readers ek saath read kar sakte hain.
+- Sirf ek Writer write karega.
+- Reader aur Writer ek saath database access nahi kar sakte.
+
+---
+
+## Variables
+
+```text
+mutex = 1
+db = 1
+rc = Reader Count
+```
+
+| Variable | Meaning |
+|----------|---------|
+| mutex | Reader Count ko safely update karne ke liye |
+| db | Database Lock |
+| rc | Current Readers ki Count |
+
+---
+
+## Reader Code
+
+```text
+Wait(mutex)
+
+rc++
+
+if(rc == 1)
+    Wait(db)
+
+Signal(mutex)
+
+Read Data
+
+Wait(mutex)
+
+rc--
+
+if(rc == 0)
+    Signal(db)
+
+Signal(mutex)
+```
+
+### Theory
+
+### Wait(mutex)
+
+Reader Count update karne ke liye lock leta hai.
+
+---
+
+### rc++
+
+Current readers ki count badhata hai.
+
+---
+
+### First Reader
+
+```text
+if(rc == 1)
+    Wait(db)
+```
+
+Pehla reader database lock karta hai.
+
+Writer ko enter nahi hone deta.
+
+---
+
+### Signal(mutex)
+
+Reader Count update complete.
+
+Doosre readers enter kar sakte hain.
+
+---
+
+### Read Data
+
+Database ko read karta hai.
+
+Multiple readers simultaneously read kar sakte hain.
+
+---
+
+### Wait(mutex)
+
+Reader Count safely decrease karne ke liye.
+
+---
+
+### rc--
+
+Reader complete ho gaya.
+
+---
+
+### Last Reader
+
+```text
+if(rc == 0)
+    Signal(db)
+```
+
+Aakhri reader database unlock karta hai.
+
+Ab writer write kar sakta hai.
+
+---
+
+### Signal(mutex)
+
+Lock release.
+
+---
+
+## Writer Code
+
+```text
+Wait(db)
+
+Write Data
+
+Signal(db)
+```
+
+### Theory
+
+### Wait(db)
+
+Database lock karta hai.
+
+Jab tak writer likh raha hai,
+
+- koi reader read nahi karega.
+- koi doosra writer write nahi karega.
+
+---
+
+### Write Data
+
+Database update karta hai.
+
+---
+
+### Signal(db)
+
+Database unlock karta hai.
+
+---
+
+## Drawback
+
+Continuous readers aate rahe to
+
+**Writer Starvation** ho sakti hai.
+
+---
+
+# 3. Dining Philosopher Problem
+
+## Problem
+
+N philosophers table par baithe hain.
+
+Har philosopher ko khana khane ke liye
+
+```text
+Left Fork
+
++
+
+Right Fork
+```
+
+dono forks chahiye.
+
+---
+
+## Philosopher Flow
+
+```text
+Think
+
+↓
+
+Pick Left Fork
+
+↓
+
+Pick Right Fork
+
+↓
+
+Eat
+
+↓
+
+Put Right Fork
+
+↓
+
+Put Left Fork
+```
+
+### Theory
+
+- Think karta hai.
+- Dono forks acquire karta hai.
+- Eat karta hai.
+- Dono forks release karta hai.
+
+---
+
+## Deadlock
+
+Agar sab philosophers ek-ek fork utha le,
+
+to sab doosre fork ka wait karenge.
+
+Result:
+
+**Deadlock**
+
+---
+
+## Prevention
+
+- Semaphore use karo.
+- Maximum N−1 philosophers ko allow karo.
+- Ek philosopher reverse order me forks uthaye.
+- Circular Wait break karo.
+
+---
+
+## Maximum Philosophers Eating Together
+
+```text
+⌊N/2⌋
+```
+
+Example
+
+```text
+N = 5
+
+Maximum = 2
+```
+
+---
+
+# 4. Concurrency vs Parallelism
+
+## Concurrency
+
+```text
+Task A
+
+↓
+
+Task B
+
+↓
+
+Task A
+```
+
+### Theory
+
+- CPU context switching karta hai.
+- Single CPU par bhi possible hai.
+- Tasks alternate execute hote hain.
+
+---
+
+## Parallelism
+
+```text
+Core 1 → Task A
+
+Core 2 → Task B
+```
+
+### Theory
+
+- Multiple CPU cores use hote hain.
+- Tasks truly same time execute hote hain.
+
+---
+
+## Difference
+
+| Concurrency | Parallelism |
+|-------------|-------------|
+| Task Management | Task Execution |
+| Context Switching | Simultaneous Execution |
+| Single CPU bhi chalega | Multi-Core CPU chahiye |
+
+---
+
+# 5. Types of Concurrency
+
+## Pseudo Concurrency
+
+- Single CPU
+- Context Switching
+- Actual parallel execution nahi hoti.
+
+---
+
+## Real Concurrency
+
+- Multiple CPUs/Cores
+- True Parallel Execution hoti hai.
+
+---
+
+# 6. Bernstein Conditions
+
+## Read Set
+
+```text
+R(S)
+```
+
+Statement kin variables ko read karta hai.
+
+---
+
+## Write Set
+
+```text
+W(S)
+```
+
+Statement kin variables ko update karta hai.
+
+---
+
+## Conditions
+
+```text
+R(Si) ∩ W(Sj) = ∅
+
+W(Si) ∩ R(Sj) = ∅
+
+W(Si) ∩ W(Sj) = ∅
+```
+
+### Theory
+
+Ye conditions check karti hain ki
+
+do statements parallel execute ho sakte hain ya nahi.
+
+Agar teeno conditions satisfy hoti hain,
+
+to statements independent hain.
+
+---
+
+### Memory Trick
+
+✅ Read-Read → Safe
+
+❌ Read-Write → Conflict
+
+❌ Write-Read → Conflict
+
+❌ Write-Write → Conflict
+
+---
+
+# 7. Parbegin - Parend
+
+## Sequential
+
+```text
+Begin
+
+S1
+
+S2
+
+End
+```
+
+---
+
+## Parallel
+
+```text
+Parbegin
+
+S1
+
+S2
+
+S3
+
+Parend
+```
+
+### Theory
+
+- Parbegin parallel execution start karta hai.
+- Sab statements simultaneously execute hoti hain.
+- Parend barrier ki tarah wait karta hai.
+- Jab tak saare tasks complete nahi hote, execution aage nahi badhti.
+
+---
+
+## Cobegin - Coend
+
+```text
+Cobegin = Parbegin
+
+Coend = Parend
+```
+
+Sirf naam alag hai.
+
+---
+
+# 8. Precedence Graph
+
+Dependency ko show karta hai.
+
+## Sequential
+
+```text
+S1
+
+↓
+
+S2
+
+↓
+
+S3
+```
+
+---
+
+## Parallel
+
+```text
+      S1
+     /  \
+   S2   S3
+     \ /
+      S4
+```
+
+### Theory
+
+- S2 aur S3 parallel execute hongi.
+- Dono complete hone ke baad hi S4 execute hoga.
+
+---
+
+# 9. Semaphore Operations
+
+## P()
+
+```text
+P()
+```
+
+### Theory
+
+- Wait Operation
+- Down Operation
+- Semaphore value decrease karta hai.
+- Agar value 0 ho to process block ho jata hai.
+
+---
+
+## V()
+
+```text
+V()
+```
+
+### Theory
+
+- Signal Operation
+- Up Operation
+- Semaphore value increase karta hai.
+- Waiting process ko wake-up karta hai.
+
+---
+
+# 10. Barrier Synchronization
+
+```text
+S1
+
+↓
+
+Parbegin
+
+S2
+
+S3
+
+Parend
+
+↓
+
+S4
+```
+
+### Theory
+
+S4 tabhi execute hoga jab
+
+- S2 complete ho
+- S3 complete ho
+
+Parend ek **Barrier** ki tarah work karta hai.
+
+---
+
+# Placement Interview Questions
+
+### Q. Mutex kyu use karte hain?
+
+Race Condition avoid karne ke liye.
+
+---
+
+### Q. Empty Semaphore ka use?
+
+Buffer Overflow avoid karne ke liye.
+
+---
+
+### Q. Full Semaphore ka use?
+
+Buffer Underflow avoid karne ke liye.
+
+---
+
+### Q. First Reader DB lock kyu karta hai?
+
+Writer ko block karne ke liye.
+
+---
+
+### Q. Last Reader DB unlock kyu karta hai?
+
+Writer ko chance dene ke liye.
+
+---
+
+### Q. Reader Writer ki drawback?
+
+Writer Starvation.
+
+---
+
+### Q. Dining Philosopher kis problem ko explain karta hai?
+
+Deadlock.
+
+---
+
+### Q. Maximum philosophers ek saath kitne eat kar sakte hain?
+
+```text
+⌊N/2⌋
+```
+
+---
+
+### Q. Concurrency aur Parallelism me difference?
+
+Concurrency → Multiple tasks manage.
+
+Parallelism → Multiple tasks same time execute.
+
+---
+
+### Q. P() kya hai?
+
+Wait / Down.
+
+---
+
+### Q. V() kya hai?
+
+Signal / Up.
+
+---
+
+### Q. Parbegin kya hai?
+
+Parallel execution start karta hai.
+
+---
+
+### Q. Parend kya hai?
+
+Barrier Synchronization.
+
+---
+
+# One Page Revision
+
+```text
+Producer Consumer
+→ Empty + Full + Mutex
+
+Reader Writer
+→ First Reader Lock
+→ Last Reader Unlock
+→ Writer Starvation
+
+Dining Philosopher
+→ Deadlock
+→ Max Eating = ⌊N/2⌋
+
+Concurrency
+→ Context Switching
+
+Parallelism
+→ Multi-Core CPU
+
+Bernstein
+→ Sirf Read-Read Safe
+
+Parbegin
+→ Parallel Start
+
+Parend
+→ Barrier
+
+P()
+→ Wait
+
+V()
+→ Signal
+```
+
+# Placement Memory Tricks 🚀
+
+✅ Producer → Produce → Empty → Mutex → Insert → Unlock → Full
+
+✅ Consumer → Full → Mutex → Remove → Unlock → Empty
+
+✅ Reader → First Lock → Last Unlock
+
+✅ Writer → Lock → Write → Unlock
+
+✅ Dining Philosopher → Sab ek fork pakdenge ⇒ Deadlock
+
+✅ Bernstein → Sirf Read-Read Safe
+
+✅ P() → Wait (Down)
+
+✅ V() → Signal (Up)
