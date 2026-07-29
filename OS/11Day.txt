@@ -1,0 +1,1004 @@
+# 📘 Operating System - Memory Management Notes (Hinglish)
+
+> 🎯 Placement + Semester Revision Notes
+
+---
+
+# 📖 Table of Contents
+
+1. Memory Management
+2. RAM Block Diagram
+3. Memory Organization
+4. Memory Capacity Formula
+5. Address Bus & Data Bus
+6. Memory Numericals
+7. Loading
+8. Linking
+9. Address Binding
+10. Types of Address Binding
+11. Multipass Processing
+12. Memory Management Techniques
+13. Overlay
+14. Fixed Partitioning (MFT)
+15. Base & Limit Register
+16. Placement Revision Sheet
+17. Interview Questions
+
+---
+
+# 1️⃣ Memory Management
+
+## Definition
+
+Memory Management ka matlab hai **RAM ko efficiently manage karna**, taaki CPU easily data aur instructions access kar sake.
+
+```
+CPU ↔ RAM
+```
+
+Operating System memory allocate, deallocate aur protect karta hai.
+
+---
+
+# 2️⃣ RAM Block Diagram
+
+```
+             Address Bus
+                  |
+                  V
+          +----------------+
+ Read --->|                |
+Write --->|      RAM       |<----> Data Bus
+ Chip --->|                |
+Select -->+----------------+
+```
+
+## Components
+
+### Address Bus
+
+- Memory ka address bhejta hai.
+- Direction:
+```
+CPU → RAM
+```
+
+Example
+
+```
+Address = 5
+
+RAM[5]
+```
+
+---
+
+### Data Bus
+
+Actual data transfer karta hai.
+
+```
+CPU ↔ RAM
+```
+
+Example
+
+```
+RAM[5]
+
+↓
+
+10101100
+
+↓
+
+CPU
+```
+
+---
+
+### Read Signal
+
+```
+Read = 1
+```
+
+RAM → CPU
+
+---
+
+### Write Signal
+
+```
+Write = 1
+```
+
+CPU → RAM
+
+---
+
+### Chip Select
+
+Multiple memory chips me decide karta hai kaunsi chip active hogi.
+
+---
+
+# 3️⃣ Memory Organization
+
+Memory ko linear form me represent karte hain.
+
+```
+Address      Data
+
+0            ----
+1            ----
+2            ----
+3            ----
+.
+.
+.
+```
+
+Har location ko bolte hain
+
+- Word
+- Cell
+- Memory Location
+
+---
+
+# 4️⃣ Important Terms
+
+## Word
+
+Ek memory location me store hone wale fixed number of bits.
+
+Example
+
+```
+Word Length =16 bits
+```
+
+---
+
+## Byte
+
+```
+1 Byte =8 bits
+```
+
+---
+
+## Word Length
+
+Ek memory location kitne bits store kar sakta hai.
+
+Example
+
+```
+16 bits
+
+32 bits
+
+64 bits
+```
+
+---
+
+# 5️⃣ Memory Capacity
+
+Formula
+
+```
+Memory Capacity
+
+=N × m bits
+```
+
+Where
+
+```
+N
+
+↓
+
+Number of Words
+```
+
+```
+m
+
+↓
+
+Word Length
+```
+
+Example
+
+```
+1024 ×16
+
+=16384 bits
+
+=2048 Bytes
+
+=2KB
+```
+
+---
+
+# 6️⃣ Address Bus Relation
+
+Suppose
+
+Address Bus
+
+```
+p bits
+```
+
+Total addresses
+
+```
+2^p
+```
+
+Hence
+
+```
+N=2^p
+```
+
+And
+
+```
+p=log₂N
+```
+
+---
+
+# 7️⃣ Important Conversions
+
+```
+2^10=1K
+
+2^20=1M
+
+2^30=1G
+
+2^40=1T
+
+2^50=1P
+```
+
+---
+
+# 8️⃣ Memory Numericals
+
+## Formula
+
+```
+N=2^n
+```
+
+```
+n=log₂N
+```
+
+```
+Memory=N×Word Size
+```
+
+---
+
+## Address Lines
+
+```
+Address Lines
+
+=log₂(Number of Words)
+```
+
+---
+
+## Data Lines
+
+```
+Data Lines
+
+=Word Length
+```
+
+---
+
+## Example
+
+Memory
+
+```
+4K×16
+```
+
+Solution
+
+```
+4K=4096=2^12
+
+Address Lines=12
+```
+
+```
+Word Length=16
+
+Data Lines=16
+```
+
+---
+
+# 9️⃣ Loading
+
+## Definition
+
+Program ko Disk se RAM me lana.
+
+```
+Disk
+
+↓
+
+Loader
+
+↓
+
+RAM
+
+↓
+
+CPU
+```
+
+---
+
+## Types
+
+### Static Loading
+
+Entire program ek baar me RAM me.
+
+Advantages
+
+- Fast
+
+Disadvantages
+
+- Memory Waste
+
+---
+
+### Dynamic Loading
+
+Sirf required module load hota hai.
+
+Advantages
+
+- Memory Efficient
+
+Disadvantages
+
+- Slow
+
+---
+
+# 🔟 Linking
+
+## Definition
+
+External references ko resolve karna.
+
+Example
+
+```
+printf()
+
+scanf()
+
+sqrt()
+```
+
+---
+
+Flow
+
+```
+Source Code
+
+↓
+
+Compiler
+
+↓
+
+Object File
+
+↓
+
+Linker
+
+↓
+
+Executable
+
+↓
+
+Loader
+
+↓
+
+RAM
+```
+
+---
+
+## Static Linking
+
+- Libraries executable ke andar copy hoti hain.
+
+Advantages
+
+- Fast
+- Secure
+
+Disadvantages
+
+- Large executable
+- Memory waste
+
+---
+
+## Dynamic Linking
+
+Libraries runtime pe load hoti hain.
+
+DLL use hoti hai.
+
+Advantages
+
+- Small executable
+- Memory Efficient
+- Reusable
+
+Disadvantages
+
+- Slow
+- Less Secure
+
+---
+
+## DLL
+
+Dynamic Link Library
+
+---
+
+## Stub
+
+Small piece of code.
+
+Actual function ka address batata hai.
+
+---
+
+# 1️⃣1️⃣ Address Binding
+
+## Definition
+
+Variable ya instruction ko memory address assign karna.
+
+Example
+
+```c
+int x;
+```
+
+Compiler
+
+```
+Name
+
+↓
+
+x
+```
+
+Loader
+
+```
+x
+
+↓
+
+Address 5000
+```
+
+---
+
+# Variable Entry
+
+| Field | Meaning |
+|--------|----------|
+| Name | Variable Name |
+| Type | int,char,float |
+| Value | Runtime Value |
+| Address | Memory Address |
+| Size | Variable Size |
+
+---
+
+# 1️⃣2️⃣ Types of Address Binding
+
+## Compile Time Binding
+
+Compiler absolute address generate karta hai.
+
+✔ Fast
+
+❌ Flexible nahi.
+
+---
+
+## Load Time Binding
+
+Loader address assign karta hai.
+
+Relative Address
+
+↓
+
+Absolute Address
+
+---
+
+## Execution Time Binding
+
+Runtime pe address change ho sakta hai.
+
+MMU use hota hai.
+
+✔ Most Flexible
+
+---
+
+# Comparison
+
+| Compile | Load | Execution |
+|----------|------|-----------|
+| Static | Static | Dynamic |
+| Compiler | Loader | MMU |
+| No relocation | Loader relocation | Runtime relocation |
+
+---
+
+# 1️⃣3️⃣ Multipass Processing
+
+```
+Source Program
+
+↓
+
+Compiler
+
+↓
+
+Object Module
+
+↓
+
+Linker
+
+↓
+
+Load Module
+
+↓
+
+Loader
+
+↓
+
+RAM
+
+↓
+
+Execution
+```
+
+---
+
+# 1️⃣4️⃣ Memory Management Techniques
+
+```
+Memory Management
+
+        |
+
+----------------------------
+
+Contiguous
+
+Non-Contiguous
+```
+
+---
+
+## Contiguous Allocation
+
+Program continuous memory me.
+
+Techniques
+
+- Overlay
+- Fixed Partition
+- Variable Partition
+- Buddy System
+
+---
+
+## Non-Contiguous Allocation
+
+Program alag-alag locations pe.
+
+Techniques
+
+- Paging
+- Segmentation
+- Paging + Segmentation
+- Demand Paging
+
+---
+
+# Functions of Memory Manager
+
+- Allocation
+- Protection
+- Free Space Management
+- Address Translation
+- Deallocation
+
+---
+
+# Goals
+
+- Minimum Memory Waste
+- Large Program ko Small Memory me execute karna
+
+---
+
+# 1️⃣5️⃣ Overlay
+
+## Definition
+
+Large program ko independent modules me divide karna.
+
+Ek time pe sirf required module RAM me.
+
+Example
+
+```
+Pass1
+
+↓
+
+Execute
+
+↓
+
+Remove
+
+↓
+
+Pass2
+
+↓
+
+Execute
+```
+
+---
+
+Condition
+
+```
+Modules independent hone chahiye.
+```
+
+---
+
+## Numerical Trick
+
+Minimum Memory Required
+
+```
+Longest Root → Leaf Path
+```
+
+---
+
+# 1️⃣6️⃣ Fixed Partitioning (MFT)
+
+Memory fixed partitions me divide hoti hai.
+
+Example
+
+```
+OS
+
+---------
+
+120KB
+
+---------
+
+220KB
+
+---------
+
+150KB
+```
+
+---
+
+Advantages
+
+- Simple
+
+---
+
+Disadvantages
+
+Internal Fragmentation
+
+Example
+
+Partition
+
+```
+100KB
+```
+
+Program
+
+```
+30KB
+```
+
+Waste
+
+```
+70KB
+```
+
+---
+
+# 1️⃣7️⃣ Base & Limit Register
+
+```
+CPU
+
+↓
+
+Address
+
+↓
+
+Address>=Base ?
+
+↓
+
+Address<Base+Limit ?
+
+↓
+
+YES
+
+↓
+
+Memory Access
+
+NO
+
+↓
+
+Trap to Operating System
+```
+
+Purpose
+
+- Memory Protection
+- Illegal Access rokna
+
+---
+
+# 🎯 Placement Revision Sheet
+
+## Important Formulas
+
+```
+N=2^p
+
+p=log₂N
+
+Memory=N×Word Size
+
+1Byte=8bits
+```
+
+---
+
+## Static Loading
+
+- Entire Program
+- Fast
+- Memory Waste
+
+---
+
+## Dynamic Loading
+
+- On Demand
+- Memory Efficient
+- Slow
+
+---
+
+## Static Linking
+
+- Library EXE ke andar
+- Fast
+- Secure
+
+---
+
+## Dynamic Linking
+
+- DLL
+- Runtime
+- Small EXE
+- Reusable
+
+---
+
+## Address Binding
+
+Compile Time
+
+↓
+
+Static
+
+Load Time
+
+↓
+
+Loader
+
+Execution Time
+
+↓
+
+MMU
+
+---
+
+## Overlay
+
+Large Program
+
+↓
+
+Small Memory
+
+↓
+
+One Module at a Time
+
+---
+
+## Fixed Partition
+
+Memory
+
+↓
+
+Fixed Blocks
+
+↓
+
+Internal Fragmentation
+
+---
+
+## Base Register
+
+Starting Address
+
+---
+
+## Limit Register
+
+Maximum Allowed Size
+
+---
+
+# 💼 Placement Interview Questions
+
+### Q1. Difference between Loading and Linking?
+
+**Loading**
+
+- Disk → RAM
+
+**Linking**
+
+- Libraries ko connect karta hai.
+
+---
+
+### Q2. Difference between Static & Dynamic Linking?
+
+- Static → Library EXE me copy
+- Dynamic → DLL runtime pe
+
+---
+
+### Q3. What is Address Binding?
+
+Variable ko memory address assign karna.
+
+---
+
+### Q4. Overlay kya hota hai?
+
+Large Program ko small memory me execute karne ki technique.
+
+---
+
+### Q5. Internal Fragmentation kya hota hai?
+
+Allocated memory ka unused part.
+
+---
+
+# ⭐ 30-Second Revision
+
+```
+Address Bus → Address
+
+Data Bus → Data
+
+Loader → RAM
+
+Linker → EXE
+
+Overlay → Large Program in Small Memory
+
+DLL → Dynamic Linking
+
+MMU → Execution Time Binding
+
+Base + Limit → Protection
+
+Memory=N×Word Size
+
+N=2^p
+```
+
+---
+
+# 🔥 Exam Tricks
+
+- Address Lines = **log₂(Number of Words)**
+- Data Lines = **Word Length**
+- Overlay Numerical = **Longest Root → Leaf Path**
+- Fixed Partition = **Internal Fragmentation**
+- Dynamic Linking = **DLL**
+- Execution Time Binding = **MMU**
